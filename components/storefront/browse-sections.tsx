@@ -6,6 +6,7 @@ import { ProductCard } from '@/components/storefront/product-card';
 import { SectionFrame } from '@/components/storefront/section-frame';
 import { Button } from '@/components/ui/button';
 import { humanActions } from '@/lib/actions/ui-actions';
+import { cardAttributesFor } from '@/lib/state/presentation';
 import { cartQuantity } from '@/lib/state/selectors';
 import { PRODUCTS } from '@/lib/catalog/products';
 import type { HerShoppingState } from '@/lib/state/types';
@@ -68,6 +69,8 @@ export function FeaturedSection({ state }: { state: HerShoppingState }) {
               violations: [],
               inCartQuantity: cartQuantity(state, product.id),
             }}
+            presentation={state.layout.presentation}
+            attributes={cardAttributesFor(state)}
             missionMode={false}
             selected={
               selection?.kind === 'product' && selection.id === product.id

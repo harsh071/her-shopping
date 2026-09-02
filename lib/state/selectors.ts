@@ -105,9 +105,9 @@ export function visibleGroups(state: HerShoppingState): GroupView[] {
     .map((groupId) => ({
       id: groupId,
       label: sectionLabel(groupId),
-      description:
-        PRIORITY_DESCRIPTIONS[groupId] ??
-        `${buckets.get(groupId)!.length} options in this group`,
+      // Only the mission groups need explaining; the count already shows in the
+      // section header, so a category name repeats nothing.
+      description: PRIORITY_DESCRIPTIONS[groupId] ?? '',
       products: buckets.get(groupId)!.slice().sort(sorter),
     }));
 }

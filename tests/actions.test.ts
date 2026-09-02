@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 
+import { PRODUCTS } from '@/lib/catalog/products';
 import { createInitialState } from '@/lib/state/initial';
+import { defaultGroupOrder } from '@/lib/state/sections';
 import { checkInvariants } from '@/lib/state/invariants';
 import { DEMO_MISSION_TEXT } from '@/lib/state/mission';
 import {
+  PRESENTATION_PRESETS,
   cartItemCount,
   cartSubtotalCents,
   checkoutWarnings,
 } from '@/lib/state/reducer';
+import { cardAttributesFor, columnCount } from '@/lib/state/presentation';
 import { cartSummary, pageContext, visibleGroups } from '@/lib/state/selectors';
 import { HerShoppingStore } from '@/lib/state/store';
 
@@ -544,5 +548,236 @@ describe('focus targets', () => {
     applyGoldenMission();
     store.reset('human');
     expect(store.getState().focus?.target).toBe('hero');
+  });
+});
+
+describe('card presentation', () => {
+  test('a preset applies a coherent design', () => {
+    const result = store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      preset: 'dense-decision',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(store.getState().layout.presentation).toEqual(
+      PRESENTATION_PRESETS['dense-decision'],
+    );
+  });
+
+  test('individual settings apply on top of a preset', () => {
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      preset: 'price-first',
+      columns: '2',
+    });
+
+    const presentation = store.getState().layout.presentation;
+    expect(presentation.priceEmphasis).toBe('prominent');
+    expect(presentation.columns).toBe('2');
+  });
+
+  test('settings without a preset patch the current design', () => {
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'human',
+      cardLayout: 'list',
+    });
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'human',
+      imageScale: 'large',
+    });
+
+    const presentation = store.getState().layout.presentation;
+    expect(presentation.cardLayout).toBe('list');
+    expect(presentation.imageScale).toBe('large');
+    expect(presentation.showDescriptions).toBe(true);
+  });
+
+  test('card attributes default to automatic and follow the mission', () => {
+    expect(store.getState().layout.presentation.cardAttributes).toBeNull();
+    expect(cardAttributesFor(store.getState())).toEqual([
+      'weight',
+      'delivery',
+      'stock',
+    ]);
+
+    applyGoldenMission();
+    expect(cardAttributesFor(store.getState())).toEqual([
+      'warmth',
+      'delivery',
+      'weight',
+    ]);
+  });
+
+  test('an explicit list overrides the automatic choice, and empty means none', () => {
+    applyGoldenMission();
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      cardAttributes: ['weight', 'stock'],
+    });
+    expect(cardAttributesFor(store.getState())).toEqual(['weight', 'stock']);
+
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      cardAttributes: [],
+    });
+    expect(cardAttributesFor(store.getState())).toEqual([]);
+
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      automaticAttributes: true,
+    });
+    expect(store.getState().layout.presentation.cardAttributes).toBeNull();
+    expect(cardAttributesFor(store.getState())).toEqual([
+      'warmth',
+      'delivery',
+      'weight',
+    ]);
+  });
+
+  test('automatic and explicit attributes cannot be requested together', () => {
+    const result = store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      cardAttributes: ['weight'],
+      automaticAttributes: true,
+    });
+    expect(result.ok).toBe(false);
+  });
+
+  test('duplicate attributes are refused', () => {
+    const result = store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      cardAttributes: ['weight', 'weight'],
+    });
+    expect(result.ok).toBe(false);
+    expect(store.getState().layout.presentation.cardAttributes).toBeNull();
+  });
+
+  test('warns when mission fit is requested with no mission', () => {
+    const result = store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      cardAttributes: ['mission-fit'],
+    });
+    expect(result.ok).toBe(true);
+    expect(result.warnings[0]).toMatch(/Mission fit/);
+  });
+
+  test('a no-op restyle is refused rather than filling the ledger', () => {
+    const result = store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      preset: 'default',
+    });
+    expect(result.ok).toBe(false);
+  });
+
+  test('list layout is always one card per row', () => {
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'human',
+      cardLayout: 'list',
+      columns: '4',
+    });
+    expect(columnCount(store.getState())).toBe(1);
+  });
+
+  test('auto columns leave the choice to the store', () => {
+    expect(columnCount(store.getState())).toBeNull();
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'human',
+      columns: '5',
+    });
+    expect(columnCount(store.getState())).toBe(5);
+  });
+
+  test('restyling is reversible and never touches the cart', () => {
+    store.dispatch({
+      type: 'add_to_cart',
+      actor: 'human',
+      items: [{ productId: 'basalt-two-tent', quantity: 1 }],
+    });
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      preset: 'visual-browse',
+    });
+    expect(store.getState().layout.presentation.cardLayout).toBe('gallery');
+
+    store.undo('human');
+    expect(store.getState().layout.presentation.cardLayout).toBe('grid');
+    expect(store.getState().cart.lines).toHaveLength(1);
+  });
+
+  test('reset restores the standard cards', () => {
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      preset: 'visual-browse',
+    });
+    store.reset('human');
+    expect(store.getState().layout.presentation).toEqual(
+      PRESENTATION_PRESETS.default,
+    );
+  });
+
+  test('a restyle points the viewport at the catalog', () => {
+    store.dispatch({
+      type: 'set_card_presentation',
+      actor: 'agent',
+      preset: 'price-first',
+    });
+    expect(store.getState().focus?.target).toBe('catalog');
+  });
+});
+
+describe('the seeded browse view', () => {
+  test('shows every product before any mission is set', () => {
+    const groups = visibleGroups(store.getState());
+    const shown = groups.flatMap((group) =>
+      group.products.map((item) => item.product.id),
+    );
+
+    expect(groups.length).toBeGreaterThan(0);
+    expect(shown).toHaveLength(PRODUCTS.length);
+    expect(new Set(shown).size).toBe(PRODUCTS.length);
+  });
+
+  test('the seeded group order matches the seeded grouping', () => {
+    const { productGrouping, groupOrder } = store.getState().layout;
+    expect(groupOrder).toEqual(defaultGroupOrder(productGrouping));
+  });
+
+  test('a group order left over from another grouping is refused', () => {
+    const broken = createInitialState();
+    broken.layout = {
+      ...broken.layout,
+      groupOrder: defaultGroupOrder('priority'),
+    };
+
+    expect(checkInvariants(broken).join(' ')).toMatch(
+      /Group order does not match/,
+    );
+  });
+
+  test('switching grouping keeps every product visible', () => {
+    applyGoldenMission();
+    for (const groupBy of ['category', 'priority', 'purpose'] as const) {
+      store.dispatch({ type: 'organize_products', actor: 'agent', groupBy });
+      const shown = visibleGroups(store.getState()).flatMap((group) =>
+        group.products.map((item) => item.product.id),
+      );
+      expect(shown, `grouping by ${groupBy}`).toHaveLength(PRODUCTS.length);
+      expect(checkInvariants(store.getState())).toEqual([]);
+    }
   });
 });

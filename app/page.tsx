@@ -23,6 +23,7 @@ import { StoreHeader } from '@/components/storefront/store-header';
 import { Button } from '@/components/ui/button';
 import { humanActions } from '@/lib/actions/ui-actions';
 import { DEMO_MISSION_TEXT } from '@/lib/state/mission';
+import { columnCount } from '@/lib/state/presentation';
 import { store } from '@/lib/state/store';
 import {
   cartSummary,
@@ -64,9 +65,19 @@ export default function Page() {
   const summary = cartSummary(state);
   const shortlist = state.layout.focusedProductIds;
   const missionMode = state.layout.mode !== 'browse' && Boolean(state.mission);
+  // An explicit column count is inherited from here, so the responsive rules in
+  // the stylesheet still take precedence on small screens.
+  const columns = columnCount(state);
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main
+      className="min-h-screen bg-background text-foreground"
+      style={
+        columns === null
+          ? undefined
+          : ({ '--card-columns': columns } as React.CSSProperties)
+      }
+    >
       <StoreHeader
         state={state}
         cartCount={summary.itemCount}

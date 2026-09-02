@@ -2,9 +2,15 @@ import { getProduct } from '@/lib/catalog/products';
 import {
   PAGE_SECTION_IDS,
   PROTECTED_SECTION_IDS,
+  defaultGroupOrder,
   isGroupSectionId,
   isSectionId,
 } from '@/lib/state/sections';
+import {
+  CARD_ATTRIBUTES,
+  CARD_LAYOUTS,
+  COLUMN_SETTINGS,
+} from '@/lib/state/presentation';
 import type { HerShoppingState } from '@/lib/state/types';
 
 export class InvariantError extends Error {}
@@ -44,6 +50,21 @@ export function checkInvariants(state: HerShoppingState): string[] {
     problems.push('Group order contains an unknown group.');
   }
 
+  // The bug this catches renders an empty catalog: a group order left over
+  // from a different grouping mode matches none of the buckets.
+  const expectedGroups = defaultGroupOrder(layout.productGrouping);
+  if (layout.groupOrder.length !== expectedGroups.length) {
+    problems.push(
+      `Group order does not match "${layout.productGrouping}" grouping.`,
+    );
+  } else if (
+    layout.groupOrder.some((groupId) => !expectedGroups.includes(groupId))
+  ) {
+    problems.push(
+      `Group order contains a group that does not belong to "${layout.productGrouping}" grouping.`,
+    );
+  }
+
   if (layout.hiddenSections.some((sectionId) => !isSectionId(sectionId))) {
     problems.push('Hidden sections contain an unknown section id.');
   }
@@ -52,6 +73,32 @@ export function checkInvariants(state: HerShoppingState): string[] {
     if (layout.hiddenSections.includes(protectedId)) {
       problems.push(`Section "${protectedId}" must stay visible.`);
     }
+  }
+
+  const { presentation } = layout;
+  if (presentation.cardAttributes) {
+    if (presentation.cardAttributes.length > 4) {
+      problems.push('A card can show at most four attributes.');
+    }
+    if (
+      new Set(presentation.cardAttributes).size !==
+      presentation.cardAttributes.length
+    ) {
+      problems.push('Card attributes must be unique.');
+    }
+    if (
+      presentation.cardAttributes.some(
+        (attribute) => !CARD_ATTRIBUTES.includes(attribute),
+      )
+    ) {
+      problems.push('Card attributes contain an unknown value.');
+    }
+  }
+  if (!CARD_LAYOUTS.includes(presentation.cardLayout)) {
+    problems.push('Unknown card layout.');
+  }
+  if (!COLUMN_SETTINGS.includes(presentation.columns)) {
+    problems.push('Unknown column setting.');
   }
 
   if (layout.focusedProductIds.length > 4) {

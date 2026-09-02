@@ -54,7 +54,49 @@ export type ProductSort = 'featured' | 'price-low' | 'mission-fit' | 'delivery';
 
 export type ComparisonAttribute = 'warmth' | 'delivery' | 'weight' | 'price';
 
+/** How a product card is shaped. */
+export type CardLayout = 'grid' | 'list' | 'gallery';
+
+export type ColumnSetting = 'auto' | '2' | '3' | '4' | '5';
+
+export type PriceEmphasis = 'subtle' | 'standard' | 'prominent';
+
+export type ImageScale = 'hidden' | 'small' | 'standard' | 'large';
+
+/** Facts a card can put on its face, in the order they are shown. */
+export type CardAttribute =
+  | 'warmth'
+  | 'delivery'
+  | 'weight'
+  | 'stock'
+  | 'mission-fit';
+
+export type PresentationPreset =
+  | 'default'
+  | 'dense-decision'
+  | 'visual-browse'
+  | 'price-first';
+
+/**
+ * Card presentation. Every field is a closed enum: an agent chooses among
+ * designs the store already ships, and can never supply markup, styles, or
+ * arbitrary sizes.
+ */
+export type PresentationState = {
+  cardLayout: CardLayout;
+  columns: ColumnSetting;
+  priceEmphasis: PriceEmphasis;
+  imageScale: ImageScale;
+  /**
+   * `null` keeps the automatic, mission-aware attribute row. An explicit list
+   * overrides it; an empty list shows no attributes at all.
+   */
+  cardAttributes: CardAttribute[] | null;
+  showDescriptions: boolean;
+};
+
 export type LayoutState = {
+  presentation: PresentationState;
   mode: LayoutMode;
   sectionOrder: PageSectionId[];
   groupOrder: GroupSectionId[];

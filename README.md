@@ -8,7 +8,7 @@ page regroups, reprioritises, hides what stopped mattering, and surfaces the
 tradeoffs — and every one of those changes is something you can also do by hand,
 inspect, and undo.
 
-It is built for the WebMCP Challenge. The site exposes 18 typed, bounded site
+It is built for the WebMCP Challenge. The site exposes 19 typed, bounded site
 tools through `document.modelContext.registerTool(...)`, and an in-page realtime
 voice agent drives the *same* tools. The page is the artifact; the conversation is
 just one way to reach it.
@@ -49,7 +49,8 @@ surface load-bearing rather than decorative:
 | **Say the mission** | The store leaves Browse View, regroups 22 products into Essential / Useful / Optional by mission fit, promotes warmth and delivery onto every card, and hides the promotional sections. |
 | **Point at something** | Clicking a card, a section, or a constraint chip sets `selectedEntity`, so “make this the reference” and “show cheaper alternatives beside this” resolve to a real thing instead of a guess. |
 | **Argue with the plan** | Constraint chips are editable. Delete “Arrives by Friday” and blocked products stop being blocked — the same recalculation the agent sees. |
-| **Reorganise by hand** | Group, sort, move, hide, restore, undo, reset. Every agent tool has a keyboard-accessible human equivalent. |
+| **Restyle the cards** | Ask for a dense comparison list, a visual gallery, or large prices, and the cards change shape — chosen from designs the store ships, never from generated CSS. |
+| **Reorganise by hand** | Group, sort, move, hide, restore, restyle, undo, reset. Every agent tool has a keyboard-accessible human equivalent. |
 | **Check out safely** | Simulated order, no payment, no address, no personal data, and an explicit human confirmation gate. |
 
 ---
@@ -87,7 +88,7 @@ progressive enhancements, not requirements.
 ## Trying the WebMCP tools
 
 **ChatGPT in-app browser** — open the deployed URL with Site tools enabled. The
-header pill reads `Agent-ready · 18/18 tools` when registration succeeded.
+header pill reads `Agent-ready · 19/19 tools` when registration succeeded.
 
 **Chrome 149+** — enable `chrome://flags/#enable-webmcp-testing`, restart, then
 open the site.
@@ -104,7 +105,8 @@ store still works — nothing is gated behind an agent.
 
 Every schema sets `additionalProperties: false`; every string, array, quantity, and
 product id is bounded or enumerated. No tool accepts markup, CSS, selectors, URLs,
-or filesystem paths.
+or filesystem paths — including `set_card_presentation`, which chooses among the
+store's own card designs rather than accepting styles.
 
 | Tool | Kind | Purpose |
 | --- | --- | --- |
@@ -114,6 +116,7 @@ or filesystem paths.
 | `set_mission` | Write | Record what the person is trying to accomplish and reorganise the store around it. |
 | `apply_mission_view` | Write | Group products into Essential, Useful, and Optional by mission fit and optionally hide promotional sections. |
 | `organize_products` | Write | Regroup and re-sort the visible catalog using approved layout modes only. |
+| `set_card_presentation` | Write | Restyle the cards: shape, cards per row, price weight, image scale, which facts show, descriptions on or off. |
 | `set_section_visibility` | Write | Show or hide known page sections and product groups. |
 | `move_section` | Write | Move one known section before or after another. |
 | `select_entity` | Write | Set what the word “this” refers to — a product, a section, a constraint, or a panel. |
@@ -141,6 +144,7 @@ lib/
     types.ts                   mission, layout, selection, cart, checkout, activity
     sections.ts                the closed set of reorderable/hideable section ids
     mission.ts                 mission parsing + mission-fit scoring (pure)
+    presentation.ts            card design vocabulary and the automatic defaults
     reducer.ts                 the single mutation path
     invariants.ts              rules that must hold after every mutation
     store.ts                   snapshots, undo, activity ledger, version gating

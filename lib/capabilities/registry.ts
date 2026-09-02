@@ -5,6 +5,14 @@ import {
   validateInput,
   type JsonSchema,
 } from '@/lib/capabilities/schema';
+import {
+  CARD_ATTRIBUTES,
+  CARD_LAYOUTS,
+  COLUMN_SETTINGS,
+  IMAGE_SCALES,
+  PRESENTATION_PRESET_NAMES,
+  PRICE_EMPHASES,
+} from '@/lib/state/presentation';
 import { ALL_SECTION_IDS } from '@/lib/state/sections';
 import {
   cartLines,
@@ -16,7 +24,13 @@ import type { HerShoppingStore } from '@/lib/state/store';
 import type {
   ActionResult,
   Actor,
+  CardAttribute,
+  CardLayout,
+  ColumnSetting,
   ComparisonAttribute,
+  ImageScale,
+  PresentationPreset,
+  PriceEmphasis,
 } from '@/lib/state/types';
 
 export type CapabilitySafety =
@@ -276,6 +290,65 @@ export const CAPABILITIES: Capability[] = [
       return store.dispatch(
         { type: 'organize_products', actor, ...args },
         { expectedStateVersion: args.expectedStateVersion },
+      );
+    },
+  },
+
+  {
+    name: 'set_card_presentation',
+    title: 'Restyle the product cards',
+    description:
+      "Change how product cards are presented: their shape, how many sit per row, how loudly the price reads, how large the imagery is, which facts appear on the card face, and whether descriptions show. Choose a named preset, individual settings, or both. Only the store's own designs are available — no markup, styles, or sizes can be supplied. Reversible layout-only change.",
+    inputSchema: objectSchema({
+      preset: {
+        type: 'string',
+        enum: [...PRESENTATION_PRESET_NAMES],
+        description:
+          'A coherent starting design. "dense-decision" for comparing many options, "visual-browse" for imagery, "price-first" when budget is the question, "default" to return to the standard cards.',
+      },
+      cardLayout: { type: 'string', enum: [...CARD_LAYOUTS] },
+      columns: {
+        type: 'string',
+        enum: [...COLUMN_SETTINGS],
+        description:
+          'Cards per row. "auto" follows the responsive default; list layout is always one.',
+      },
+      priceEmphasis: { type: 'string', enum: [...PRICE_EMPHASES] },
+      imageScale: { type: 'string', enum: [...IMAGE_SCALES] },
+      cardAttributes: {
+        type: 'array',
+        minItems: 0,
+        maxItems: 4,
+        uniqueItems: true,
+        items: { type: 'string', enum: [...CARD_ATTRIBUTES] },
+        description:
+          'Facts shown on the card face, in order. An empty array shows none. Supplying this turns off the automatic mission-aware choice.',
+      },
+      automaticAttributes: {
+        type: 'boolean',
+        description:
+          'Set true to return to the automatic, mission-aware attribute row. Cannot be combined with cardAttributes.',
+      },
+      showDescriptions: { type: 'boolean' },
+    }),
+    readOnly: false,
+    safety: 'reversible-layout',
+    run: (store, input, actor) => {
+      const args = validateInput<{
+        preset?: PresentationPreset;
+        cardLayout?: CardLayout;
+        columns?: ColumnSetting;
+        priceEmphasis?: PriceEmphasis;
+        imageScale?: ImageScale;
+        cardAttributes?: CardAttribute[];
+        automaticAttributes?: boolean;
+        showDescriptions?: boolean;
+        expectedStateVersion?: number;
+      }>(CAPABILITY_SCHEMAS.set_card_presentation, input);
+      const { expectedStateVersion, ...presentation } = args;
+      return store.dispatch(
+        { type: 'set_card_presentation', actor, ...presentation },
+        { expectedStateVersion },
       );
     },
   },

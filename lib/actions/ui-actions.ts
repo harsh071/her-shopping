@@ -1,6 +1,12 @@
 import { store } from '@/lib/state/store';
 import type {
+  CardAttribute,
+  CardLayout,
+  ColumnSetting,
   ComparisonAttribute,
+  ImageScale,
+  PresentationPreset,
+  PriceEmphasis,
   ProductGrouping,
   ProductSort,
   SelectedEntity,
@@ -66,6 +72,20 @@ export const humanActions = {
       relation,
       anchorSectionId,
     }),
+
+  setPresentation: (
+    patch: Partial<{
+      preset: PresentationPreset;
+      cardLayout: CardLayout;
+      columns: ColumnSetting;
+      priceEmphasis: PriceEmphasis;
+      imageScale: ImageScale;
+      cardAttributes: CardAttribute[];
+      automaticAttributes: boolean;
+      showDescriptions: boolean;
+    }>,
+  ) =>
+    store.dispatch({ type: 'set_card_presentation', actor: 'human', ...patch }),
 
   select: (entity: SelectedEntity | null) =>
     store.dispatch({ type: 'select_entity', actor: 'human', entity }),

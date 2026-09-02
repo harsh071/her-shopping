@@ -29,11 +29,12 @@ Nothing else. No application source predates the window.
 | Catalog | 22 original fictional products with names, descriptions, prices, weights, warmth ratings, delivery windows, stock, and purpose tags |
 | State core | Typed mission/layout/selection/cart/checkout model, deterministic mission parsing, mission-fit scoring, layout invariants, snapshot history, activity ledger |
 | Action layer | A single validated reducer shared by human controls, voice, and WebMCP |
-| Capabilities | 18 bounded tools with JSON Schemas, a runtime validator, and a contract auditor |
+| Capabilities | 19 bounded tools with JSON Schemas, a runtime validator, and a contract auditor |
 | WebMCP | Imperative top-level registration with structured failures, status reporting, and retry for late API injection |
 | Voice | Realtime speech-to-speech over WebRTC, driving the same capability registry, with a server-side ephemeral-credential route |
+| Presentation | A closed card-design vocabulary — layout, columns, price weight, image scale, card attributes, descriptions — with four named presets, driven by people and agents through the same action |
 | Interface | Browse, Mission, and Comparison views; editable constraint chips; section frames with move/hide controls; activity ledger; change toast; diagnostics panel; cart, checkout review, confirmation gate, and demo receipt |
-| Tests | 68 Vitest cases across parsing, scoring, invariants, schemas, tool behaviour, and WebMCP registration |
+| Tests | 95 Vitest cases across parsing, scoring, invariants, schemas, tool behaviour, and WebMCP registration |
 | Docs | This file, `README.md`, `LICENSE`, `.env.example` |
 
 ## Third-party material

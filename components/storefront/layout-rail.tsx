@@ -3,6 +3,7 @@
 import { Eye, RotateCcw, Undo2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { DisplayControl } from '@/components/storefront/display-control';
 import { humanActions } from '@/lib/actions/ui-actions';
 import { sectionLabel, type SectionId } from '@/lib/state/sections';
 import type {
@@ -71,6 +72,7 @@ export function LayoutRail({ state }: { state: HerShoppingState }) {
       </fieldset>
 
       <div className="ml-auto flex items-center gap-2">
+        <DisplayControl state={state} />
         {hidden.length > 0 ? (
           <details className="hidden-sections">
             <summary>

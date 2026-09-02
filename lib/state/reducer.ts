@@ -1,10 +1,4 @@
-import {
-  PRODUCTS,
-  PRODUCT_CATEGORIES,
-  PURPOSE_TAGS,
-  getProduct,
-  type Product,
-} from '@/lib/catalog/products';
+import { PRODUCTS, getProduct, type Product } from '@/lib/catalog/products';
 import { dollars, pluralize } from '@/lib/format';
 import {
   parseMission,
@@ -14,18 +8,25 @@ import {
 import {
   PRIORITY_GROUP_IDS,
   PROTECTED_SECTION_IDS,
+  defaultGroupOrder,
   isGroupSectionId,
   isPageSectionId,
   sectionLabel,
-  type GroupSectionId,
   type PageSectionId,
   type SectionId,
 } from '@/lib/state/sections';
 import type {
   Actor,
+  CardAttribute,
+  CardLayout,
+  ColumnSetting,
   ComparisonAttribute,
   ConstraintKind,
   HerShoppingState,
+  ImageScale,
+  PresentationPreset,
+  PresentationState,
+  PriceEmphasis,
   LayoutState,
   ProductGrouping,
   ProductSort,
@@ -57,6 +58,18 @@ export type StoreAction =
       actor: Actor;
       groupBy?: ProductGrouping;
       sortBy?: ProductSort;
+    }
+  | {
+      type: 'set_card_presentation';
+      actor: Actor;
+      preset?: PresentationPreset;
+      cardLayout?: CardLayout;
+      columns?: ColumnSetting;
+      priceEmphasis?: PriceEmphasis;
+      imageScale?: ImageScale;
+      cardAttributes?: CardAttribute[];
+      automaticAttributes?: boolean;
+      showDescriptions?: boolean;
     }
   | {
       type: 'set_section_visibility';
@@ -119,15 +132,58 @@ function fail(error: string, warnings: string[] = []): ReduceOutcome {
   return { ok: false, error, warnings };
 }
 
-export function defaultGroupOrder(grouping: ProductGrouping): GroupSectionId[] {
-  if (grouping === 'priority') return [...PRIORITY_GROUP_IDS];
-  if (grouping === 'category') {
-    return PRODUCT_CATEGORIES.map(
-      (category) => `group:${category}` as GroupSectionId,
-    );
-  }
-  return PURPOSE_TAGS.map((tag) => `group:${tag}-purpose` as GroupSectionId);
-}
+/**
+ * Named card designs the store already ships. A preset is a coherent starting
+ * point; individual fields passed alongside it are applied on top.
+ */
+export const PRESENTATION_PRESETS: Record<
+  PresentationPreset,
+  PresentationState
+> = {
+  default: {
+    cardLayout: 'grid',
+    columns: 'auto',
+    priceEmphasis: 'standard',
+    imageScale: 'standard',
+    cardAttributes: null,
+    showDescriptions: true,
+  },
+  // Many options, scanned quickly: full-width rows, small images, every
+  // decision attribute on the face of the card.
+  'dense-decision': {
+    cardLayout: 'list',
+    columns: 'auto',
+    priceEmphasis: 'standard',
+    imageScale: 'small',
+    cardAttributes: ['warmth', 'delivery', 'weight', 'mission-fit'],
+    showDescriptions: false,
+  },
+  // Browsing for feel rather than specification.
+  'visual-browse': {
+    cardLayout: 'gallery',
+    columns: '3',
+    priceEmphasis: 'subtle',
+    imageScale: 'large',
+    cardAttributes: [],
+    showDescriptions: false,
+  },
+  // Budget is the question: prices large, everything else out of the way.
+  'price-first': {
+    cardLayout: 'grid',
+    columns: '4',
+    priceEmphasis: 'prominent',
+    imageScale: 'small',
+    cardAttributes: ['delivery', 'stock'],
+    showDescriptions: false,
+  },
+};
+
+const PRESENTATION_LABELS: Record<PresentationPreset, string> = {
+  default: 'the standard card design',
+  'dense-decision': 'a dense decision list',
+  'visual-browse': 'a visual browsing gallery',
+  'price-first': 'a price-led grid',
+};
 
 function withHidden(
   layout: LayoutState,
@@ -466,6 +522,86 @@ export function reduce(
         warnings: [],
         undoable: true,
         data: { groupBy, sortBy },
+      };
+    }
+
+    case 'set_card_presentation': {
+      const base = action.preset
+        ? PRESENTATION_PRESETS[action.preset]
+        : state.layout.presentation;
+      if (action.preset && !base) return fail(`Unknown presentation preset.`);
+
+      if (
+        action.cardAttributes &&
+        new Set(action.cardAttributes).size !== action.cardAttributes.length
+      ) {
+        return fail('Card attributes must be unique.');
+      }
+      if (action.automaticAttributes && action.cardAttributes) {
+        return fail(
+          'Choose either automatic attributes or an explicit list, not both.',
+        );
+      }
+
+      const presentation: PresentationState = {
+        ...base,
+        cardLayout: action.cardLayout ?? base.cardLayout,
+        columns: action.columns ?? base.columns,
+        priceEmphasis: action.priceEmphasis ?? base.priceEmphasis,
+        imageScale: action.imageScale ?? base.imageScale,
+        showDescriptions: action.showDescriptions ?? base.showDescriptions,
+        cardAttributes: action.automaticAttributes
+          ? null
+          : (action.cardAttributes ?? base.cardAttributes),
+      };
+
+      const unchanged =
+        presentation.cardLayout === state.layout.presentation.cardLayout &&
+        presentation.columns === state.layout.presentation.columns &&
+        presentation.priceEmphasis ===
+          state.layout.presentation.priceEmphasis &&
+        presentation.imageScale === state.layout.presentation.imageScale &&
+        presentation.showDescriptions ===
+          state.layout.presentation.showDescriptions &&
+        JSON.stringify(presentation.cardAttributes) ===
+          JSON.stringify(state.layout.presentation.cardAttributes);
+      if (unchanged) return fail('The cards already look like that.');
+
+      const warnings: string[] = [];
+      if (
+        presentation.cardAttributes?.includes('mission-fit') &&
+        !state.mission
+      ) {
+        warnings.push('Mission fit only has a value once a mission is set.');
+      }
+      if (
+        presentation.imageScale === 'hidden' &&
+        presentation.cardLayout === 'gallery'
+      ) {
+        warnings.push('A gallery with hidden images shows very little.');
+      }
+
+      const described = action.preset
+        ? `Switched the cards to ${PRESENTATION_LABELS[action.preset]}.`
+        : `Cards are now a ${presentation.cardLayout} with ${presentation.priceEmphasis} pricing.`;
+
+      return {
+        ok: true,
+        state: { ...state, layout: { ...state.layout, presentation } },
+        focus: 'catalog',
+        title: 'Restyled the product cards',
+        summary: described,
+        detail: `${presentation.cardLayout} layout, ${presentation.columns} columns, ${presentation.imageScale} images, ${
+          presentation.cardAttributes === null
+            ? 'automatic'
+            : presentation.cardAttributes.length === 0
+              ? 'no'
+              : presentation.cardAttributes.join(' / ')
+        } attributes.`,
+        changedEntityIds: ['catalog', 'presentation'],
+        warnings,
+        undoable: true,
+        data: { presentation },
       };
     }
 

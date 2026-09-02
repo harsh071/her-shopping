@@ -5,6 +5,7 @@ import { Layers } from 'lucide-react';
 import { ProductCard } from '@/components/storefront/product-card';
 import { SectionFrame } from '@/components/storefront/section-frame';
 import { humanActions } from '@/lib/actions/ui-actions';
+import { cardAttributesFor, columnCount } from '@/lib/state/presentation';
 import type { GroupView } from '@/lib/state/selectors';
 import type { HerShoppingState } from '@/lib/state/types';
 
@@ -16,6 +17,9 @@ export function CatalogCanvas({
   groups: GroupView[];
 }) {
   const missionMode = state.layout.mode !== 'browse' && Boolean(state.mission);
+  const presentation = state.layout.presentation;
+  const attributes = cardAttributesFor(state);
+  const columns = columnCount(state);
   const selection = state.selection;
   const visibleIds = groups.map((group) => group.id);
 
@@ -70,11 +74,17 @@ export function CatalogCanvas({
             </span>
           }
         >
-          <div className={`product-grid ${missionMode ? 'is-mission' : ''}`}>
+          <div
+            className={`product-grid layout-${presentation.cardLayout} ${
+              columns === null ? 'cols-auto' : ''
+            } ${missionMode ? 'is-mission' : ''}`}
+          >
             {group.products.map((view) => (
               <ProductCard
                 key={view.product.id}
                 view={view}
+                presentation={presentation}
+                attributes={attributes}
                 missionMode={missionMode}
                 selected={
                   selection?.kind === 'product' &&

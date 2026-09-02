@@ -1,13 +1,25 @@
-import {
-  PRIORITY_GROUP_IDS,
-  DEFAULT_SECTION_ORDER,
-} from '@/lib/state/sections';
-import type { HerShoppingState, LayoutState } from '@/lib/state/types';
+import { DEFAULT_SECTION_ORDER, defaultGroupOrder } from '@/lib/state/sections';
+import type {
+  HerShoppingState,
+  LayoutState,
+  PresentationState,
+} from '@/lib/state/types';
+
+export const INITIAL_PRESENTATION: PresentationState = {
+  cardLayout: 'grid',
+  columns: 'auto',
+  priceEmphasis: 'standard',
+  imageScale: 'standard',
+  cardAttributes: null,
+  showDescriptions: true,
+};
 
 export const INITIAL_LAYOUT: LayoutState = {
+  presentation: INITIAL_PRESENTATION,
   mode: 'browse',
   sectionOrder: [...DEFAULT_SECTION_ORDER],
-  groupOrder: [...PRIORITY_GROUP_IDS],
+  // Must match `productGrouping` below, or the canvas renders nothing.
+  groupOrder: defaultGroupOrder('category'),
   hiddenSections: ['mission-summary', 'comparison'],
   productGrouping: 'category',
   productSort: 'featured',
@@ -22,6 +34,8 @@ export function createInitialState(): HerShoppingState {
     mission: null,
     layout: {
       ...INITIAL_LAYOUT,
+      presentation: { ...INITIAL_PRESENTATION },
+      groupOrder: [...INITIAL_LAYOUT.groupOrder],
       hiddenSections: [...INITIAL_LAYOUT.hiddenSections],
     },
     selection: null,

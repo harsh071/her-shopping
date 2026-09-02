@@ -1,4 +1,5 @@
-import { PRODUCT_CATEGORIES } from '@/lib/catalog/products';
+import { PRODUCT_CATEGORIES, PURPOSE_TAGS } from '@/lib/catalog/products';
+import type { ProductGrouping } from '@/lib/state/types';
 
 /** Regions of the page an agent or person may reorder or hide. */
 export const PAGE_SECTION_IDS = [
@@ -110,3 +111,14 @@ export const DEFAULT_SECTION_ORDER: PageSectionId[] = [
   'catalog',
   'editorial',
 ];
+
+/** The canonical group order for a grouping mode. */
+export function defaultGroupOrder(grouping: ProductGrouping): GroupSectionId[] {
+  if (grouping === 'priority') return [...PRIORITY_GROUP_IDS];
+  if (grouping === 'category') {
+    return PRODUCT_CATEGORIES.map(
+      (category) => `group:${category}` as GroupSectionId,
+    );
+  }
+  return PURPOSE_TAGS.map((tag) => `group:${tag}-purpose` as GroupSectionId);
+}
