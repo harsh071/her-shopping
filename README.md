@@ -83,6 +83,11 @@ progressive enhancements, not requirements.
 | `OPENAI_REALTIME_VOICE` | No | Defaults to `marin`. |
 | `NEXT_PUBLIC_SITE_URL` | No | Absolute URLs for page metadata. |
 
+For a hosted ChatGPT Site, add `OPENAI_API_KEY` in the Site's environment
+settings and mark it as a secret. Hosted values are read from runtime Worker
+bindings; `.env.local` remains the local-development source. The long-lived key
+is never included in the browser bundle.
+
 ---
 
 ## Trying the WebMCP tools

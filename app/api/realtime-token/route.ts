@@ -1,9 +1,33 @@
 import { NextResponse } from 'next/server';
+import { env } from 'cloudflare:workers';
 
 import {
   DEFAULT_REALTIME_VOICE,
   VOICE_AGENT_INSTRUCTIONS,
 } from '@/lib/voice/instructions';
+
+type RealtimeEnvironment = {
+  OPENAI_API_KEY?: string;
+  OPENAI_REALTIME_MODEL?: string;
+  OPENAI_REALTIME_VOICE?: string;
+};
+
+/**
+ * Hosted ChatGPT Sites expose environment variables and secrets as Cloudflare
+ * Worker bindings. Keep process.env as the local-development fallback so
+ * .env.local continues to work with `npm run dev`.
+ */
+function serverEnvironment(): RealtimeEnvironment {
+  const bindings = env as RealtimeEnvironment;
+
+  return {
+    OPENAI_API_KEY: bindings.OPENAI_API_KEY ?? process.env.OPENAI_API_KEY,
+    OPENAI_REALTIME_MODEL:
+      bindings.OPENAI_REALTIME_MODEL ?? process.env.OPENAI_REALTIME_MODEL,
+    OPENAI_REALTIME_VOICE:
+      bindings.OPENAI_REALTIME_VOICE ?? process.env.OPENAI_REALTIME_VOICE,
+  };
+}
 
 /**
  * Mints a short-lived realtime client credential.
@@ -12,7 +36,8 @@ import {
  * an ephemeral secret it uses to negotiate one WebRTC call.
  */
 export async function POST() {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const runtime = serverEnvironment();
+  const apiKey = runtime.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
       {
@@ -23,8 +48,8 @@ export async function POST() {
     );
   }
 
-  const model = process.env.OPENAI_REALTIME_MODEL ?? 'gpt-realtime';
-  const voice = process.env.OPENAI_REALTIME_VOICE ?? DEFAULT_REALTIME_VOICE;
+  const model = runtime.OPENAI_REALTIME_MODEL ?? 'gpt-realtime';
+  const voice = runtime.OPENAI_REALTIME_VOICE ?? DEFAULT_REALTIME_VOICE;
 
   const headers = {
     Authorization: `Bearer ${apiKey}`,
