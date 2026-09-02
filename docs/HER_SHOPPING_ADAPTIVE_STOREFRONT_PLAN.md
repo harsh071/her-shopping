@@ -1,4 +1,4 @@
-# Cartograph — Adaptive Storefront Implementation Plan
+# Her Shopping — Adaptive Storefront Implementation Plan
 
 **Working tagline:** A storefront that redraws itself around your mission.  
 **Product category:** Human-agent adaptive interface / agentic commerce  
@@ -8,13 +8,13 @@
 
 ## 1. Executive decision
 
-Build **Cartograph**, a fictional commerce page whose layout can be reorganized by a human or an agent around the person's current goal.
+Build **Her Shopping**, a fictional commerce page whose layout can be reorganized by a human or an agent around the person's current goal.
 
 The user does not ask an assistant to click through a conventional store. They describe what they are trying to accomplish:
 
 > “I am going camping in Iceland for five days. Keep the total below $700, prioritize warmth and Friday delivery, and organize the store around what I still need.”
 
-Cartograph interprets that intent and visibly transforms the page:
+Her Shopping interprets that intent and visibly transforms the page:
 
 - irrelevant navigation and products are deemphasized or hidden;
 - products are regrouped into Essential, Useful, and Optional;
@@ -34,7 +34,7 @@ The user can then continue by voice or direct manipulation:
 
 ### Product thesis
 
-**Most websites are organized around the seller's information architecture. Cartograph temporarily reorganizes the interface around the user's intent, while keeping every change visible, bounded, and reversible.**
+**Most websites are organized around the seller's information architecture. Her Shopping temporarily reorganizes the interface around the user's intent, while keeping every change visible, bounded, and reversible.**
 
 ### Hackathon thesis
 
@@ -42,7 +42,7 @@ WebMCP is not used as a remote-control layer for simulated clicks. The site deli
 
 ## 2. What is being built
 
-Cartograph is one polished adaptive storefront with three forms:
+Her Shopping is one polished adaptive storefront with three forms:
 
 1. **Browse View** — the conventional human-designed store.
 2. **Mission View** — the same store restructured around a declared outcome and constraints.
@@ -68,7 +68,7 @@ Agent continues from the same live state
 
 ### Why this is not a generic shopping assistant
 
-| Generic shopping agent | Cartograph |
+| Generic shopping agent | Her Shopping |
 | --- | --- |
 | Operates the store's existing layout | Reconfigures the store into a task-specific interface |
 | Primarily search and add-to-cart | Inspect, restructure, compare, explain, and transact |
@@ -103,7 +103,7 @@ The initial page should resemble a refined fictional outdoor/lifestyle store, bu
 
 Visible regions:
 
-- **Header:** Cartograph wordmark, categories, search, cart, and agent-ready indicator.
+- **Header:** Her Shopping wordmark, categories, search, cart, and agent-ready indicator.
 - **Mission Bar:** a prominent input reading “What are you trying to accomplish?” with voice control.
 - **Featured Section:** 3–4 highlighted products.
 - **Catalog Canvas:** 18 seeded products in a familiar category grid.
@@ -211,7 +211,7 @@ The reset control must remain available even if the agent hides or moves other r
 The key to reliability is separating product data, user intent, layout, selection, and commerce state.
 
 ```ts
-type CartographState = {
+type HerShoppingState = {
   catalog: Product[];
   mission: Mission | null;
   layout: LayoutState;
@@ -599,7 +599,7 @@ components/
     demo-receipt.tsx
 lib/
   catalog/products.ts
-  state/cartograph-store.ts
+  state/her-shopping-store.ts
   state/types.ts
   state/invariants.ts
   actions/layout-actions.ts
@@ -618,7 +618,7 @@ tests/
   golden-path.spec.ts
 docs/
   HACKATHON_VISION.md
-  CARTOGRAPH_ADAPTIVE_STOREFRONT_PLAN.md
+  HER_SHOPPING_ADAPTIVE_STOREFRONT_PLAN.md
   HACKATHON_DELTA.md
 ```
 
@@ -703,7 +703,7 @@ Deliverables:
 - initialize the app in this hackathon repository;
 - create a clean Git history with dated commits;
 - add `README.md`, `LICENSE`, `.env.example`, and `HACKATHON_DELTA.md`;
-- record that Cartograph is a new hackathon project;
+- record that Her Shopping is a new hackathon project;
 - create the fictional catalog and document all asset licenses.
 
 Acceptance:
@@ -933,7 +933,7 @@ By the end:
 
 ### 0:00–0:15 — premise
 
-“Stores are organized around catalogs. Cartograph reorganizes the store around what you are trying to accomplish.”
+“Stores are organized around catalogs. Her Shopping reorganizes the store around what you are trying to accomplish.”
 
 Show the conventional Browse View.
 
@@ -957,7 +957,7 @@ Add two products, open checkout review, show the total, and explicitly confirm t
 
 Briefly open the WebMCP diagnostics/tool view and show the registered semantic tools. Close with:
 
-> “Cartograph does not merely let an agent operate a store. It lets people and agents reshape the interface together.”
+> “Her Shopping does not merely let an agent operate a store. It lets people and agents reshape the interface together.”
 
 ## 18. Judging-criteria alignment
 
@@ -1003,12 +1003,12 @@ The page becomes a temporary, personalized tool without losing the designed comp
 | Tool calls partially apply | Validate first and apply compound changes atomically |
 | WebMCP availability differs by browser | Provide agent-ready diagnostics and test both stated judge paths |
 | Checkout appears unsafe | Use fictional products, no PII/payment, visible review, explicit confirmation |
-| Existing-project rule becomes ambiguous | Build Cartograph fresh in this repository and document any reused assets/patterns |
+| Existing-project rule becomes ambiguous | Build Her Shopping fresh in this repository and document any reused assets/patterns |
 | Scope expands into a page builder | Reject arbitrary components/code; ship only Browse, Mission, and Comparison modes |
 
 ## 20. Definition of done
 
-Cartograph is ready to submit only when all of the following are true:
+Her Shopping is ready to submit only when all of the following are true:
 
 - [ ] A public visitor can use Browse View without signing in.
 - [ ] The page reports WebMCP availability clearly.
@@ -1033,8 +1033,8 @@ Cartograph is ready to submit only when all of the following are true:
 ## 21. Immediate next actions
 
 1. Initialize the Next.js application in this repository.
-2. Create the original Cartograph visual identity and 18-product fixture.
-3. Implement `CartographState`, invariants, action results, history, and reset.
+2. Create the original Her Shopping visual identity and 18-product fixture.
+3. Implement `HerShoppingState`, invariants, action results, history, and reset.
 4. Build Browse View and the human-controlled Mission transformation.
 5. Complete selection, comparison, cart, and fictional checkout.
 6. Add the shared capability registry.
@@ -1054,7 +1054,7 @@ Cartograph is ready to submit only when all of the following are true:
 
 ## Final recommendation
 
-Proceed with Cartograph as an **adaptive storefront**, not a voice shopping assistant and not a general page builder.
+Proceed with Her Shopping as an **adaptive storefront**, not a voice shopping assistant and not a general page builder.
 
 The one sentence that should govern product, code, and demo decisions is:
 

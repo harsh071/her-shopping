@@ -1,6 +1,6 @@
-# Cartograph — WebMCP Hackathon Product Vision
+# Her Shopping — WebMCP Hackathon Product Vision
 
-> **Decision update — September 1, 2026:** Cartograph has evolved from an intent-to-cart assistant into an **adaptive storefront that restructures its own interface around the user's mission**. This document remains the original research and compliance brief. The current implementation specification is [CARTOGRAPH_ADAPTIVE_STOREFRONT_PLAN.md](./CARTOGRAPH_ADAPTIVE_STOREFRONT_PLAN.md).
+> **Decision update — September 1, 2026:** Her Shopping has evolved from an intent-to-cart assistant into an **adaptive storefront that restructures its own interface around the user's mission**. This document remains the original research and compliance brief. The current implementation specification is [HER_SHOPPING_ADAPTIVE_STOREFRONT_PLAN.md](./HER_SHOPPING_ADAPTIVE_STOREFRONT_PLAN.md).
 
 **Working tagline:** Say the moment. Shape the cart.
 
@@ -13,7 +13,7 @@
 
 ## 1. Executive decision
 
-Build **Cartograph**, a fictional lifestyle store where a person describes the real-world moment they want to create and a voice agent turns that fuzzy intent into a complete, constrained, editable cart.
+Build **Her Shopping**, a fictional lifestyle store where a person describes the real-world moment they want to create and a voice agent turns that fuzzy intent into a complete, constrained, editable cart.
 
 Example:
 
@@ -25,7 +25,7 @@ This direction is stronger than either a pure study app or a normal shopping ass
 
 ### Product thesis
 
-**People do not naturally think in SKUs. They think in outcomes, constraints, and tradeoffs. Cartograph lets a person speak the outcome while an agent assembles and visibly negotiates the cart.**
+**People do not naturally think in SKUs. They think in outcomes, constraints, and tradeoffs. Her Shopping lets a person speak the outcome while an agent assembles and visibly negotiates the cart.**
 
 ## 2. Why this concept wins the idea decision
 
@@ -33,7 +33,7 @@ This direction is stronger than either a pure study app or a normal shopping ass
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Pure study planner/tutor | 4/5 | 4/5 | 3/5 | 4/5 | 3/5 | 18/25 |
 | Generic voice shopping store | 5/5 | 5/5 | 2/5 | 4/5 | 5/5 | 21/25 |
-| **Cartograph: intent-to-outcome commerce** | **5/5** | **5/5** | **4/5** | **5/5** | **4/5** | **23/25** |
+| **Her Shopping: intent-to-outcome commerce** | **5/5** | **5/5** | **4/5** | **5/5** | **4/5** | **23/25** |
 
 ### Why not lead with the study app
 
@@ -43,7 +43,7 @@ A study app can have real impact, but its obvious features—summaries, plans, f
 
 Search, recommendations, add-to-cart, and checkout are an excellent WebMCP fit, but a generic version is already familiar. OpenAI’s showcase currently includes a shared grocery cart and several storefront concepts. A standard “find shoes under $100 and add them to cart” demo would score well on feasibility but weakly on creativity.
 
-### Why Cartograph is distinct
+### Why Her Shopping is distinct
 
 - It shops for a **multi-item outcome**, not a single product.
 - The agent must reconcile budget, preferences, exclusions, quantities, and purpose.
@@ -52,7 +52,7 @@ Search, recommendations, add-to-cart, and checkout are an excellent WebMCP fit, 
 - Voice is useful because people can describe a messy situation faster than they can fill out filters.
 - The WebMCP tool sequence is non-trivial, visible, and easy for judges to verify.
 
-The study idea should remain a future vertical, not part of the MVP. Cartograph’s action layer could later power a “build my study ritual” scene, but combining tutoring and commerce now would dilute the story.
+The study idea should remain a future vertical, not part of the MVP. Her Shopping’s action layer could later power a “build my study ritual” scene, but combining tutoring and commerce now would dilute the story.
 
 ## 3. Hackathon rules and compliance gates
 
@@ -116,7 +116,7 @@ The four Stage Two criteria are equally weighted. The product should be designed
 
 **What judges ask:** Is the use thorough, skillful, working, and non-trivial?
 
-Cartograph’s evidence:
+Her Shopping’s evidence:
 
 - Ten narrow, structured tools cover discovery, intent, comparison, cart repair, and checkout.
 - Tools operate on the same state and UI that the person sees.
@@ -129,7 +129,7 @@ Cartograph’s evidence:
 
 **What judges ask:** Is this a coherent product rather than a technical proof of concept?
 
-Cartograph’s evidence:
+Her Shopping’s evidence:
 
 - A polished single-page experience with a clear start, collaboration loop, cart, confirmation, and receipt.
 - Both voice and direct manipulation change the same interface.
@@ -142,11 +142,11 @@ Cartograph’s evidence:
 
 **Problem:** Product search is optimized for known items. It is tedious when the user knows the outcome but not the exact shopping list, and current assistants often hide why an item was selected or lose constraints during cart changes.
 
-**Impact claim:** Cartograph compresses a multi-search, multi-filter shopping session into a transparent collaboration without removing human control.
+**Impact claim:** Her Shopping compresses a multi-search, multi-filter shopping session into a transparent collaboration without removing human control.
 
 ### Creativity & Ambition
 
-Cartograph differs from an AI search box through its Intent Map, live constraint repair, reversible agent ledger, and outcome-based multi-item scenes. The ambition is in the interaction model, not in unnecessary infrastructure.
+Her Shopping differs from an AI search box through its Intent Map, live constraint repair, reversible agent ledger, and outcome-based multi-item scenes. The ambition is in the interaction model, not in unnecessary infrastructure.
 
 ## 5. Core experience
 
@@ -332,7 +332,7 @@ They do not improve the core judging evidence. A deterministic local catalog and
 
 ### P0 — must ship
 
-- Original Cartograph visual identity and responsive single-page UI.
+- Original Her Shopping visual identity and responsive single-page UI.
 - 18–24 seeded fictional products with original/licensed images.
 - Intent Map, Scene Board, cart meter, and action ledger.
 - The ten WebMCP tools above, backed by the real UI action layer.
@@ -395,7 +395,7 @@ They do not improve the core judging evidence. A deterministic local catalog and
 
 ### 0:00–0:15 — problem and promise
 
-“Online stores make you search item by item, even when what you actually know is the moment you want to create. Cartograph lets a person and an agent build that outcome together.”
+“Online stores make you search item by item, even when what you actually know is the moment you want to create. Her Shopping lets a person and an agent build that outcome together.”
 
 Show the empty Intent Map and Scene Board.
 
@@ -417,7 +417,7 @@ Ask to check out. Show `preview_checkout`, the human confirmation modal, and the
 
 Open the Site tools panel or WebMCP inspector. Briefly show the registered tools and the repository’s shared registration code.
 
-Close with: “Cartograph is not a chatbot attached to a store. It is a store designed as a shared workspace for people and agents.”
+Close with: “Her Shopping is not a chatbot attached to a store. It is a store designed as a shared workspace for people and agents.”
 
 Do not use copyrighted music. Let the product audio and voice interaction carry the video.
 
@@ -477,4 +477,4 @@ Voice implementation:
 
 ## Final recommendation
 
-Proceed with **Cartograph**. It preserves the strongest part of the commerce idea—an unmistakable end-to-end WebMCP workflow—while avoiding the cliché of a voice-controlled product grid. The build should feel like a shared visual planning surface that happens to end in a cart. Ship one beautiful, deterministic, safe scenario rather than a broad store.
+Proceed with **Her Shopping**. It preserves the strongest part of the commerce idea—an unmistakable end-to-end WebMCP workflow—while avoiding the cliché of a voice-controlled product grid. The build should feel like a shared visual planning surface that happens to end in a cart. Ship one beautiful, deterministic, safe scenario rather than a broad store.
