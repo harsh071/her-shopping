@@ -1,6 +1,8 @@
 # Her Shopping — WebMCP Hackathon Product Vision
 
 > **Decision update — September 1, 2026:** Her Shopping has evolved from an intent-to-cart assistant into an **adaptive storefront that restructures its own interface around the user's mission**. This document remains the original research and compliance brief. The current implementation specification is [HER_SHOPPING_ADAPTIVE_STOREFRONT_PLAN.md](./HER_SHOPPING_ADAPTIVE_STOREFRONT_PLAN.md).
+>
+> [https://webmcp.devpost.com/updates/46161-2-days-left-and-what-judges-actually-look-for](https://webmcp.devpost.com/updates/46161-2-days-left-and-what-judges-actually-look-for) add these docs so that we know what to look for
 
 **Working tagline:** Say the moment. Shape the cart.
 
