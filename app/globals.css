@@ -100,6 +100,34 @@ input:focus-visible {
   color: rgba(31, 43, 36, 0.5);
 }
 
+/* --- Hero ---------------------------------------------------------------
+   A full-bleed split: the pitch on a forest panel, the kit photographed on
+   the right, feathered into the green so the two halves read as one frame. */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  box-shadow: 0 30px 80px -40px rgba(31, 43, 36, 0.5);
+}
+.hero-image {
+  position: relative;
+  min-height: 100%;
+  background-image:
+    linear-gradient(
+      100deg,
+      #243b30 0%,
+      rgba(36, 59, 48, 0.55) 26%,
+      rgba(36, 59, 48, 0.05) 62%
+    ),
+    url('/expedition-flatlay.png');
+  background-size:
+    100% 100%,
+    cover;
+  background-position:
+    center,
+    54% 42%;
+  background-repeat: no-repeat;
+}
+
 .voice-console {
   position: sticky;
   top: 72px;
@@ -261,17 +289,21 @@ input:focus-visible {
 .agent-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  border: 1px solid rgba(36, 59, 48, 0.15);
+  gap: 7px;
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: rgba(36, 59, 48, 0.05);
-  padding: 7px 12px;
-  color: #243b30;
+  background: transparent;
+  padding: 6px 11px;
+  color: rgba(31, 43, 36, 0.5);
   font-size: 11px;
   font-weight: 500;
+  transition:
+    background 160ms ease,
+    color 160ms ease;
 }
 .agent-pill:hover {
-  background: rgba(36, 59, 48, 0.1);
+  background: rgba(36, 59, 48, 0.06);
+  color: #243b30;
 }
 
 .section-frame {
@@ -302,6 +334,16 @@ input:focus-visible {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+/* The per-section arrange controls stay out of the way until the shopper
+   actually engages the section — a store, not a dashboard. */
+.section-frame-tools button {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.section-frame:hover .section-frame-tools button,
+.section-frame:focus-within .section-frame-tools button {
+  opacity: 1;
 }
 
 .catalog-canvas {
@@ -501,10 +543,10 @@ input:focus-visible {
   min-width: 0;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(31, 43, 36, 0.11);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 4px 16px rgba(31, 43, 36, 0.035);
+  border: 1px solid rgba(31, 43, 36, 0.08);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(31, 43, 36, 0.04);
   transition:
     transform 220ms ease,
     box-shadow 220ms ease,
@@ -513,9 +555,9 @@ input:focus-visible {
   animation: card-in 420ms ease-out both;
 }
 .product-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(31, 43, 36, 0.22);
-  box-shadow: 0 18px 38px rgba(31, 43, 36, 0.08);
+  transform: translateY(-4px);
+  border-color: rgba(31, 43, 36, 0.14);
+  box-shadow: 0 22px 44px -18px rgba(31, 43, 36, 0.28);
 }
 .product-card.is-selected {
   border-color: #e96845;
@@ -574,12 +616,25 @@ input:focus-visible {
   position: relative;
   height: 210px;
   overflow: hidden;
-  background: #ded7c7;
+  background: #e4dccb;
 }
 .product-image-hit {
   display: block;
   width: 100%;
   height: 100%;
+}
+.product-image-hit::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(
+    180deg,
+    rgba(31, 43, 36, 0.16) 0%,
+    transparent 26%,
+    transparent 60%,
+    rgba(31, 43, 36, 0.28) 100%
+  );
+  pointer-events: none;
 }
 .product-photo {
   position: absolute;
