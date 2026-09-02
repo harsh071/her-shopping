@@ -781,3 +781,84 @@ describe('the seeded browse view', () => {
     }
   });
 });
+
+describe('the cart drawer', () => {
+  test('starts closed and can be opened and closed', () => {
+    expect(store.getState().overlays.cart).toBe(false);
+
+    expect(
+      store.dispatch({ type: 'set_cart_open', actor: 'agent', open: true }).ok,
+    ).toBe(true);
+    expect(store.getState().overlays.cart).toBe(true);
+
+    expect(
+      store.dispatch({ type: 'set_cart_open', actor: 'human', open: false }).ok,
+    ).toBe(true);
+    expect(store.getState().overlays.cart).toBe(false);
+  });
+
+  test('opening an already-open cart is refused rather than logged twice', () => {
+    store.dispatch({ type: 'set_cart_open', actor: 'agent', open: true });
+    expect(
+      store.dispatch({ type: 'set_cart_open', actor: 'agent', open: true }).ok,
+    ).toBe(false);
+  });
+
+  test('is recorded in the ledger but is not an undo step', () => {
+    applyGoldenMission();
+    const undoDepth = store.getState().history.length;
+
+    store.dispatch({ type: 'set_cart_open', actor: 'agent', open: true });
+
+    expect(store.getState().activity[0].title).toBe('Opened the cart');
+    expect(store.getState().history).toHaveLength(undoDepth);
+
+    // Undo reaches past the drawer to the layout change beneath it.
+    store.undo('human');
+    expect(store.getState().layout.mode).toBe('browse');
+    expect(store.getState().overlays.cart).toBe(true);
+  });
+
+  test('opening the cart changes nothing about its contents', () => {
+    store.dispatch({
+      type: 'add_to_cart',
+      actor: 'human',
+      items: [{ productId: 'basalt-two-tent', quantity: 1 }],
+    });
+    const before = store.getState().cart;
+
+    store.dispatch({ type: 'set_cart_open', actor: 'agent', open: true });
+    expect(store.getState().cart).toEqual(before);
+    expect(store.getState().checkout.stage).toBe('idle');
+  });
+
+  test('checkout puts the drawer on screen and keeps it there through the receipt', () => {
+    store.dispatch({
+      type: 'add_to_cart',
+      actor: 'human',
+      items: [{ productId: 'basalt-two-tent', quantity: 1 }],
+    });
+    expect(store.getState().overlays.cart).toBe(false);
+
+    store.dispatch({ type: 'preview_checkout', actor: 'agent' });
+    expect(store.getState().overlays.cart).toBe(true);
+
+    const token = store.getState().checkout.token!;
+    store.dispatch({ type: 'confirm_demo_order', actor: 'human', token });
+
+    // The stage no longer forces the drawer, so the receipt relies on this.
+    expect(store.getState().checkout.stage).toBe('placed');
+    expect(store.getState().overlays.cart).toBe(true);
+  });
+
+  test('opening the cart does not move the page', () => {
+    store.dispatch({ type: 'set_cart_open', actor: 'agent', open: true });
+    expect(store.getState().focus).toBeNull();
+  });
+
+  test('reset closes the drawer', () => {
+    store.dispatch({ type: 'set_cart_open', actor: 'agent', open: true });
+    store.reset('human');
+    expect(store.getState().overlays.cart).toBe(false);
+  });
+});

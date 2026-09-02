@@ -689,6 +689,32 @@ export const CAPABILITIES: Capability[] = [
   },
 
   {
+    name: 'open_cart',
+    title: 'Open or close the cart',
+    description:
+      'Bring the cart drawer on screen so the person can see the kit, its line items, and the running total — or close it again. This only moves the drawer: it changes no cart contents and places no order.',
+    inputSchema: objectSchema({
+      open: {
+        type: 'boolean',
+        default: true,
+        description: 'True to show the cart, false to close it.',
+      },
+    }),
+    readOnly: false,
+    safety: 'reversible-layout',
+    run: (store, input, actor) => {
+      const args = validateInput<{
+        open?: boolean;
+        expectedStateVersion?: number;
+      }>(CAPABILITY_SCHEMAS.open_cart, input);
+      return store.dispatch(
+        { type: 'set_cart_open', actor, open: args.open ?? true },
+        { expectedStateVersion: args.expectedStateVersion },
+      );
+    },
+  },
+
+  {
     name: 'preview_checkout',
     title: 'Open the checkout review',
     description:

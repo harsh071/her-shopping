@@ -48,6 +48,7 @@ export function createInitialState(): HerShoppingState {
       order: null,
     },
     focus: null,
+    overlays: { cart: false },
     activity: [
       {
         id: 'seed',

@@ -21,6 +21,7 @@ import { ComparisonView } from '@/components/storefront/comparison-view';
 import { LayoutRail } from '@/components/storefront/layout-rail';
 import { StoreHeader } from '@/components/storefront/store-header';
 import { Button } from '@/components/ui/button';
+import { useBodyScrollLock } from '@/components/ui/use-body-scroll-lock';
 import { humanActions } from '@/lib/actions/ui-actions';
 import { DEMO_MISSION_TEXT } from '@/lib/state/mission';
 import { columnCount } from '@/lib/state/presentation';
@@ -36,7 +37,6 @@ import { registerWebMcpToolsWhenReady } from '@/lib/webmcp/register-tools';
 export default function Page() {
   const state = useStoreState();
   const voice = useVoice();
-  const [cartRequested, setCartRequested] = useState(false);
   const [ledgerOpen, setLedgerOpen] = useState(false);
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
 
@@ -53,12 +53,16 @@ export default function Page() {
   const checkoutOpen =
     state.checkout.stage === 'review' ||
     state.checkout.stage === 'awaiting-confirmation';
-  const cartOpen = cartRequested || checkoutOpen;
+  const cartOpen = state.overlays.cart || checkoutOpen;
 
   const closeCart = () => {
     if (checkoutOpen) humanActions.cancelCheckout();
-    setCartRequested(false);
+    if (state.overlays.cart) humanActions.setCartOpen(false);
   };
+
+  // The page must not scroll behind an open drawer, or closing it strands the
+  // person somewhere they never navigated to.
+  useBodyScrollLock(cartOpen || ledgerOpen);
 
   const groups = useMemo(() => visibleGroups(state), [state]);
   const sections = useMemo(() => visibleSections(state), [state]);
@@ -81,7 +85,7 @@ export default function Page() {
       <StoreHeader
         state={state}
         cartCount={summary.itemCount}
-        onOpenCart={() => setCartRequested(true)}
+        onOpenCart={() => humanActions.setCartOpen(true)}
         onOpenLedger={() => setLedgerOpen(true)}
         onToggleDiagnostics={() => setDiagnosticsOpen((open) => !open)}
       />

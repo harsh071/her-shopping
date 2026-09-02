@@ -163,9 +163,10 @@ export class HerShoppingStore {
             reversible(this.state, undoToken!, outcome.title),
           ].slice(-MAX_HISTORY)
         : this.state.history,
-      activity: outcome.undoable
-        ? [entry, ...this.state.activity].slice(0, MAX_ACTIVITY)
-        : this.state.activity,
+      activity:
+        (outcome.log ?? outcome.undoable)
+          ? [entry, ...this.state.activity].slice(0, MAX_ACTIVITY)
+          : this.state.activity,
       lastAction: { name, ok: true, summary: outcome.summary },
       capabilities: this.state.capabilities,
     };

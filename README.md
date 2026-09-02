@@ -8,7 +8,7 @@ page regroups, reprioritises, hides what stopped mattering, and surfaces the
 tradeoffs — and every one of those changes is something you can also do by hand,
 inspect, and undo.
 
-It is built for the WebMCP Challenge. The site exposes 19 typed, bounded site
+It is built for the WebMCP Challenge. The site exposes 20 typed, bounded site
 tools through `document.modelContext.registerTool(...)`, and an in-page realtime
 voice agent drives the *same* tools. The page is the artifact; the conversation is
 just one way to reach it.
@@ -88,7 +88,7 @@ progressive enhancements, not requirements.
 ## Trying the WebMCP tools
 
 **ChatGPT in-app browser** — open the deployed URL with Site tools enabled. The
-header pill reads `Agent-ready · 19/19 tools` when registration succeeded.
+header pill reads `Agent-ready · 20/20 tools` when registration succeeded.
 
 **Chrome 149+** — enable `chrome://flags/#enable-webmcp-testing`, restart, then
 open the site.
@@ -127,6 +127,7 @@ store's own card designs rather than accepting styles.
 | `update_cart_quantity` | Write | Set one cart line's quantity, or remove it with zero. |
 | `undo_last_action` | Write | Restore the most recent reversible snapshot, whoever made the change. |
 | `reset_experience` | Consequential | Return everything to the seeded Browse View. Requires `confirmed: true`. |
+| `open_cart` | Write | Bring the cart drawer on screen, or close it. Changes no contents. |
 | `preview_checkout` | Write | Validate the cart and open the visible review surface. Creates no order. |
 | `place_demo_order` | Consequential | Raise the confirmation gate. Returns `orderPlaced: false` until a person confirms. |
 

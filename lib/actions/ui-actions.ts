@@ -126,6 +126,9 @@ export const humanActions = {
       quantity,
     }),
 
+  setCartOpen: (open: boolean) =>
+    store.dispatch({ type: 'set_cart_open', actor: 'human', open }),
+
   previewCheckout: () =>
     store.dispatch({ type: 'preview_checkout', actor: 'human' }),
   requestConfirmation: () =>

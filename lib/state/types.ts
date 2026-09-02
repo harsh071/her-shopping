@@ -213,8 +213,17 @@ export type FocusRequest = {
   version: number;
 };
 
+/**
+ * Surfaces that sit above the page. Deliberately outside the undo snapshot:
+ * undoing a layout change should not reopen a drawer the person just closed.
+ */
+export type OverlayState = {
+  cart: boolean;
+};
+
 export type HerShoppingState = ReversibleState & {
   focus: FocusRequest | null;
+  overlays: OverlayState;
   activity: ActivityEntry[];
   history: ReversibleSnapshot[];
   stateVersion: number;

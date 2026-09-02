@@ -107,6 +107,7 @@ export type StoreAction =
       productId: string;
       quantity: number;
     }
+  | { type: 'set_cart_open'; actor: Actor; open: boolean }
   | { type: 'preview_checkout'; actor: Actor }
   | { type: 'request_order_confirmation'; actor: Actor }
   | { type: 'confirm_demo_order'; actor: Actor; token: string }
@@ -125,6 +126,11 @@ export type ReduceOutcome =
       data?: unknown;
       /** Section, group, or product id the interface should bring into view. */
       focus?: string | null;
+      /**
+       * Whether the action belongs in the visible ledger. Defaults to
+       * `undoable`, so an action can be recorded without being reversible.
+       */
+      log?: boolean;
     }
   | { ok: false; error: string; warnings?: string[] };
 
@@ -1019,6 +1025,33 @@ export function reduce(
       };
     }
 
+    case 'set_cart_open': {
+      if (state.overlays.cart === action.open) {
+        return fail(
+          action.open
+            ? 'The cart is already open.'
+            : 'The cart is already closed.',
+        );
+      }
+      const itemCount = cartItemCount(state);
+      return {
+        ok: true,
+        state: { ...state, overlays: { ...state.overlays, cart: action.open } },
+        title: action.open ? 'Opened the cart' : 'Closed the cart',
+        summary: action.open
+          ? `The cart is on screen with ${itemCount} ${pluralize(itemCount, 'item')} at ${dollars(cartSubtotalCents(state))}.`
+          : 'The cart drawer was closed.',
+        detail: 'The cart contents are unchanged; only the drawer moved.',
+        changedEntityIds: ['cart'],
+        warnings: [],
+        // Opening a drawer is not a page change worth an undo step, but it is
+        // worth recording so the person can see the agent did it.
+        undoable: false,
+        log: true,
+        data: { cartOpen: action.open, itemCount },
+      };
+    }
+
     case 'preview_checkout': {
       if (state.cart.lines.length === 0)
         return fail('The cart is empty — nothing to review.');
@@ -1031,6 +1064,7 @@ export function reduce(
         ok: true,
         state: {
           ...state,
+          overlays: { ...state.overlays, cart: true },
           checkout: {
             stage: 'review',
             token,
@@ -1066,6 +1100,7 @@ export function reduce(
         ok: true,
         state: {
           ...state,
+          overlays: { ...state.overlays, cart: true },
           checkout: {
             stage: 'awaiting-confirmation',
             token,
